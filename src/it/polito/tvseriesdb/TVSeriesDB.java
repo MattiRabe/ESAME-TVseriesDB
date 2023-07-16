@@ -73,7 +73,7 @@ public class TVSeriesDB {
 	 * @return number of seasons inserted so far for the TV series
 	 * @throws TSException in case of non-existing TV Series or wrong releaseDate
 	 */
-	public int addSeason(String tvSeriesTitle, int numbEpisodes, String releaseDate) throws TSException {
+	public int addSeason(String tvSeriesTitle, int numEpisodes, String releaseDate) throws TSException {
 		return -1;
 	}
 	
@@ -113,7 +113,7 @@ public class TVSeriesDB {
 	 * @return number of registered users
 	 * @throws TSException in case username is already registered
 	 */
-	public int addUser(String username, String favGenre) throws TSException {
+	public int addUser(String username, String genre) throws TSException {
 		return -1;
 	}
 
@@ -185,7 +185,7 @@ public class TVSeriesDB {
 	 * Computes the best actors working in tv series of a transmission service passed
 	 * in input. The best actors have worked only in tv series of that transmission service
 	 * with average rating higher than 8.
-	 * @param transmService	transmission service to consider
+	 * @param transmissionService	transmission service to consider
 	 * @return the best actors' names as "name surname" list
 	 * @throws TSException	in case of transmission service not in the DB
 	 */
