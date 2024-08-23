@@ -2,9 +2,16 @@ package it.polito.tvseriesdb;
 
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedList;
+import java.util.TreeMap;
 
 
 public class TVSeriesDB {
+
+	LinkedList<String> trasmissionServices = new LinkedList<>();
+	TreeMap<String, TVSeries> tvSeries = new TreeMap<>();
+	TreeMap<String, Actor> actors = new TreeMap<>();
+
 
 	// R1
 	
@@ -17,7 +24,8 @@ public class TVSeriesDB {
 	 * @return number of transmission service inserted so far
 	 */
 	public int addTransmissionService(String...tServices) {
-		return -1;
+		for(String s: tServices) if(!trasmissionServices.contains(s)) trasmissionServices.add(s);
+		return trasmissionServices.size();
 	}
 	
 	/**
@@ -32,7 +40,12 @@ public class TVSeriesDB {
 	 * @throws TSException if TV Series is already inserted or transmission service does not exist.
 	 */
 	public int addTVSeries(String title, String tService, String genre) throws TSException {
-		return -1;
+		if(!trasmissionServices.contains(tService)) throw new TSException();
+		if(tvSeries.containsKey(title)) throw new TSException();
+
+		tvSeries.put(title, new TVSeries(title, tService, genre));
+
+		return tvSeries.size();
 	}
 	
 	/**
@@ -46,7 +59,10 @@ public class TVSeriesDB {
 	 * @throws TSException if actor has already been inserted.
 	 */
 	public int addActor(String name, String surname, String nationality) throws TSException {
-		return -1;
+		if(actors.containsKey(name+" "+surname)) throw new TSException();
+
+		actors.put(name+" "+surname, new Actor(name+" "+surname, name, surname, nationality));
+		return actors.size();
 	}
 	
 	/**
@@ -59,7 +75,12 @@ public class TVSeriesDB {
 	 * @throws TSException in case of non-existing actor or TV Series does not exist
 	 */
 	public int addCast(String tvSeriesTitle, String...actors) throws TSException {
-		return -1;
+		if(!tvSeries.containsKey(tvSeriesTitle)) throw new TSException();
+		for(String s : actors) if(!this.actors.containsKey(s)) throw new TSException();
+
+		for(String s : actors) tvSeries.get(tvSeriesTitle).addActorToCast(this.actors.get(s));
+
+		return tvSeries.get(tvSeriesTitle).getCast().size();
 	}
       
 	// R2
