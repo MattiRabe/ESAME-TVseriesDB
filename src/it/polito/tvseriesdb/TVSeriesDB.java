@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.LinkedList;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 
 public class TVSeriesDB {
@@ -95,7 +96,15 @@ public class TVSeriesDB {
 	 * @throws TSException in case of non-existing TV Series or wrong releaseDate
 	 */
 	public int addSeason(String tvSeriesTitle, int numEpisodes, String releaseDate) throws TSException {
-		return -1;
+		if(!tvSeries.containsKey(tvSeriesTitle)) throw new TSException();
+		String[] date = releaseDate.split(":");
+		String dateCompl = date[2]+date[1]+date[0]; 
+		Integer intDate = Integer.parseInt(dateCompl);
+		if (tvSeries.get(tvSeriesTitle).getLatestExitDate()>intDate) throw new TSException();
+		
+		tvSeries.get(tvSeriesTitle).addSeason(new Season(tvSeries.get(tvSeriesTitle).getSeasons().size()+1,tvSeriesTitle, numEpisodes, intDate));
+		
+		return tvSeries.get(tvSeriesTitle).getSeasons().size();
 	}
 	
 
@@ -110,7 +119,15 @@ public class TVSeriesDB {
 	 * 			of the episode or exceeding number of episodes inserted
 	 */
 	public int addEpisode(String tvSeriesTitle, int numSeason, String episodeTitle) throws TSException {
-		return -1;
+		if(!tvSeries.containsKey(tvSeriesTitle)) throw new TSException();
+		if(!tvSeries.get(tvSeriesTitle).getSeasons().containsKey(numSeason)) throw new TSException();
+		if(tvSeries.get(tvSeriesTitle).getSeasons().get(numSeason).getNumEpisode()==tvSeries.get(tvSeriesTitle).getSeasons().get(numSeason).getEpisodes().size()) throw new TSException();
+		if(tvSeries.get(tvSeriesTitle).getSeasons().get(numSeason).getEpisodes().contains(episodeTitle)) throw new TSException();
+		
+		tvSeries.get(tvSeriesTitle).getSeasons().get(numSeason).addEpisode(episodeTitle);
+
+
+		return tvSeries.get(tvSeriesTitle).getSeasons().get(numSeason).getEpisodes().size();
 	}
 
 	/**
@@ -121,7 +138,8 @@ public class TVSeriesDB {
 	 * 
 	 */
 	public Map<String, List<Integer>> checkMissingEpisodes() {
-		return null;
+		return tvSeries.values().stream().flatMap(s->s.getSeasons().values().stream())
+		.filter(s->s.getEpisodes().size()<s.getNumEpisode()).collect(Collectors.groupingBy(Season::getNameSerie, TreeMap::new, Collectors.mapping(Season::getNumber, Collectors.toList())));
 	}
 
 	// R3

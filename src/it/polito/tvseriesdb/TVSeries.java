@@ -1,6 +1,7 @@
 package it.polito.tvseriesdb;
 
 import java.util.LinkedList;
+import java.util.TreeMap;
 
 public class TVSeries {
 
@@ -8,6 +9,8 @@ public class TVSeries {
     private String tService;
     private String genre;
     private LinkedList<Actor> cast = new LinkedList<>();
+    private TreeMap<Integer, Season> seasons = new TreeMap<>();
+
 
     
     public TVSeries(String name, String tService, String genre) {
@@ -32,6 +35,20 @@ public class TVSeries {
 
     public void addActorToCast(Actor a){
         cast.add(a);
+    }
+
+    public TreeMap<Integer, Season> getSeasons() {
+        return seasons;
+    }
+
+    
+    public void addSeason(Season s){
+        seasons.put(s.getNumber(), s);
+    }
+
+    public Integer getLatestExitDate(){
+        if(seasons.size()==0) return 0;
+        return seasons.get(seasons.size()-1).getExitDate();
     }
     
 
