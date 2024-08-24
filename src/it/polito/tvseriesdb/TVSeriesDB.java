@@ -12,6 +12,7 @@ public class TVSeriesDB {
 	LinkedList<String> trasmissionServices = new LinkedList<>();
 	TreeMap<String, TVSeries> tvSeries = new TreeMap<>();
 	TreeMap<String, Actor> actors = new TreeMap<>();
+	TreeMap<String, User> users = new TreeMap<>();
 
 
 	// R1
@@ -153,7 +154,9 @@ public class TVSeriesDB {
 	 * @throws TSException in case username is already registered
 	 */
 	public int addUser(String username, String genre) throws TSException {
-		return -1;
+		if(users.containsKey(username)) throw new TSException();
+		users.put(username, new User(username, genre));
+		return users.size();
 	}
 
 	/**
@@ -166,7 +169,12 @@ public class TVSeriesDB {
 	 * @throws TSException in case user is not registered or TV series does not exist
 	 */
 	public int likeTVSeries(String username, String tvSeriesTitle) throws TSException {
-		return -1;
+		if(!users.containsKey(username)) throw new TSException();
+		if(!tvSeries.containsKey(tvSeriesTitle)) throw new TSException();
+		if(users.get(username).getFavSeries().containsKey(tvSeriesTitle))  throw new TSException();
+
+		users.get(username).addFavSeries(tvSeries.get(tvSeriesTitle));
+		return users.get(username).getFavSeries().size();
 	}
 	
 	/**
@@ -177,7 +185,14 @@ public class TVSeriesDB {
 	 * @throws TSException if user does not exist
 	 */
 	public List<String> suggestTVSeries(String username) throws TSException {
-		return null;
+		if(!users.containsKey(username)) throw new TSException();
+
+		List<String> list = tvSeries.values().stream().filter(s->users.get(username).getFavSeries().containsKey(s.getName())==false)
+		.filter(s->users.get(username).getFavGenre().equals(s.getGenre())).map(TVSeries::getName)
+		.collect(Collectors.toList());
+
+		if(list.size()==0) list.add("");
+		return list;
 	}
 	
 	//R4 
