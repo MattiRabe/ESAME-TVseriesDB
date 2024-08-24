@@ -2,6 +2,7 @@ package it.polito.tvseriesdb;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -80,7 +81,10 @@ public class TVSeriesDB {
 		if(!tvSeries.containsKey(tvSeriesTitle)) throw new TSException();
 		for(String s : actors) if(!this.actors.containsKey(s)) throw new TSException();
 
-		for(String s : actors) tvSeries.get(tvSeriesTitle).addActorToCast(this.actors.get(s));
+		for(String s : actors){
+			tvSeries.get(tvSeriesTitle).addActorToCast(this.actors.get(s));
+			this.actors.get(s).addSerie(tvSeries.get(tvSeriesTitle));
+		}
 
 		return tvSeries.get(tvSeriesTitle).getCast().size();
 	}
@@ -230,7 +234,7 @@ public class TVSeriesDB {
 
 		if(l.size()==0) return 0;
 		int numEle = l.size();
-		double tot = l.stream().collect(Collectors.summarizingInt(Rate::getScore)).getSum();
+		double tot = l.stream().collect(Collectors.summarizingDouble(Rate::getScore)).getSum();
 		return tot/numEle;
 	}
 	
@@ -245,7 +249,18 @@ public class TVSeriesDB {
 	 * @throws TSException	in case of invalid user, score or TV Series
 	 */
 	public String mostAwaitedSeason(String currDate) throws TSException {
-		return null;
+		List<String> l = tvSeries.values().stream().sorted(Comparator.comparing(TVSeries::getAverageScore).reversed())
+		.collect(Collectors.mapping(TVSeries::getName, Collectors.toList()));
+
+		String[] date = currDate.split(":");
+		String dateCompl = date[2]+date[1]+date[0]; 
+		Integer intDate = Integer.parseInt(dateCompl);
+		for(String s: l) if(tvSeries.get(s).getLatestExitDate()>intDate){
+			String f = tvSeries.get(s).getName() + tvSeries.get(s).getSeasons().get(tvSeries.get(s).getSeasons().size());
+			return f;
+		}
+
+		return "";
 	}
 	
 	/**
@@ -257,7 +272,10 @@ public class TVSeriesDB {
 	 * @throws TSException	in case of transmission service not in the DB
 	 */
 	public List<String> bestActors(String transmissionService) throws TSException {
-		return null;
+		if(!trasmissionServices.contains(transmissionService)) throw new TSException();
+
+		return actors.values().stream().filter(a->a.isBestActor(transmissionService)==true)
+		.map(Actor::getNameSurname).collect(Collectors.toList());
 	}
 
 	
