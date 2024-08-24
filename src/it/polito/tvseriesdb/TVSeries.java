@@ -48,7 +48,7 @@ public class TVSeries {
 
     public Integer getLatestExitDate(){
         if(seasons.size()==0) return 0;
-        return seasons.get(seasons.size()-1).getExitDate();
+        return seasons.get(seasons.size()).getExitDate();
     }
     
 
