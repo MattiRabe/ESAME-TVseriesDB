@@ -10,9 +10,9 @@ public class TVSeries {
     private String genre;
     private LinkedList<Actor> cast = new LinkedList<>();
     private TreeMap<Integer, Season> seasons = new TreeMap<>();
+    private TreeMap<String, Rate> reviews = new TreeMap<>();
 
 
-    
     public TVSeries(String name, String tService, String genre) {
         this.name = name;
         this.tService = tService;
@@ -50,6 +50,24 @@ public class TVSeries {
         if(seasons.size()==0) return 0;
         return seasons.get(seasons.size()).getExitDate();
     }
+
+    public TreeMap<String, Rate> getReviews() {
+        return reviews;
+    }
+
+    public void addReview(Rate r){
+        reviews.put(r.getUsername(), r);
+    }
+
+    public double getAverageScore() {
+
+        int totEl = reviews.size();
+        double totRate = 0.0;
+        for(Rate r : reviews.values()) totRate+=r.getScore();
+        return totRate/totEl;
+    }
+
+    
     
 
 

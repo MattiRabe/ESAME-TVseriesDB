@@ -207,7 +207,13 @@ public class TVSeriesDB {
 	 * @throws TSException	in case of invalid user, score or TV Series
 	 */
 	public double addReview(String username, String tvSeries, int score) throws TSException {
-		return -1.0;
+		if(!users.containsKey(username)) throw new TSException();
+		if(!this.tvSeries.containsKey(tvSeries)) throw new TSException();
+		if(score<0 || score>10) throw new TSException();
+
+		this.tvSeries.get(tvSeries).addReview(new Rate(username, score));
+
+		return this.tvSeries.get(tvSeries).getAverageScore();
 	}
 
 	/**
@@ -218,7 +224,14 @@ public class TVSeriesDB {
 	 * @throws TSException	in case of invalid user, score or TV Series
 	 */
 	public double averageRating(String username) throws TSException {
-		return -1.0;
+		List<Rate>  l = users.get(username).getFavSeries().values().stream()
+		.flatMap(s->s.getReviews().values().stream()).filter(r->r.getUsername().equals(username))
+		.collect(Collectors.toList());
+
+		if(l.size()==0) return 0;
+		int numEle = l.size();
+		double tot = l.stream().collect(Collectors.summarizingInt(Rate::getScore)).getSum();
+		return tot/numEle;
 	}
 	
 	// R5
